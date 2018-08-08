@@ -1,9 +1,10 @@
 ﻿namespace NServiceBus.Transports.RabbitMQ
 {
+    using global::RabbitMQ.Client;
     using System;
     using System.Linq;
-    using global::RabbitMQ.Client;
     using Unicast;
+    using RabbitMQHeaders = global::RabbitMQ.Client.Headers;
 
     static class RabbitMqTransportMessageExtensions
     {
@@ -40,6 +41,12 @@
             else
             {
                 properties.ContentType = "application/octet-stream";
+            }
+
+            byte priority;
+            if (message.Headers.ContainsKey(RabbitMQHeaders.XPriority) && byte.TryParse(message.Headers[RabbitMQHeaders.XPriority], out priority))
+            {
+                properties.Priority = priority;
             }
 
             var replyToAddress = options.ReplyToAddress ?? message.ReplyToAddress;

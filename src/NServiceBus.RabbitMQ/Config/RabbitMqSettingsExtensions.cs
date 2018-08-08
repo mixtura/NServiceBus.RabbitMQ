@@ -95,5 +95,17 @@
             transportExtensions.GetSettings().Set(Features.RabbitMqTransportFeature.CustomMessageIdStrategy, customIdStrategy);
             return transportExtensions;
         }
+
+        /// <summary>
+        /// Enable prioritized queue.
+        /// </summary>
+        /// <param name="transportExtensions"></param>
+        /// <param name="maxPriority">Max priority that message can get.</param>
+        /// <returns></returns>
+        public static TransportExtensions<RabbitMQTransport> EnablePriority(this TransportExtensions<RabbitMQTransport> transportExtensions, byte maxPriority)
+        {
+            transportExtensions.GetSettings().Set(RabbitMQ.Client.Headers.XMaxPriority, maxPriority);
+            return transportExtensions;
+        }
     }
 }
