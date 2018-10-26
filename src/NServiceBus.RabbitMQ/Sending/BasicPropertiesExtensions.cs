@@ -81,6 +81,11 @@
             {
                 properties.ReplyTo = replyToAddress;
             }
+
+            if (messageHeaders.TryGetValue(Headers.XPriority, out var priority) && byte.TryParse(priority, out var parsedPriority))
+            {
+                properties.Priority = parsedPriority;
+            }
         }
 
         static bool CalculateDelay(List<DeliveryConstraint> deliveryConstraints, Dictionary<string, string> messageHeaders, bool routingTopologySupportsDelayedDelivery, out long delay, out string destination)
