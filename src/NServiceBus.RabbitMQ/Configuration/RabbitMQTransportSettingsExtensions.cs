@@ -46,6 +46,18 @@
         }
 
         /// <summary>
+        /// Uses the convention routing topology with prioritized queues.
+        /// </summary>
+        /// <param name="transportExtensions"></param>
+        /// <param name="maxPriority">Max priority of queue message.</param>
+        public static TransportExtensions<RabbitMQTransport> UseConventionRoutingWithPrioritySupportTopology(this TransportExtensions<RabbitMQTransport> transportExtensions, byte maxPriority)
+        {
+            transportExtensions.UseRoutingTopology(durable => new ConventionalRoutingWithPrioritySupportTopology(durable, maxPriority));
+
+            return transportExtensions;
+        }
+
+        /// <summary>
         /// Registers a custom routing topology.
         /// </summary>
         [ObsoleteEx(RemoveInVersion = "6.0", TreatAsErrorFromVersion = "5.0", ReplacementTypeOrMember = "RabbitMQTransportSettingsExtensions.UseRoutingTopology(TransportExtensions<RabbitMQTransport> transportExtensions, Func<bool, IRoutingTopology>)")]
