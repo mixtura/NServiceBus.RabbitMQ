@@ -75,13 +75,15 @@
             channel.BasicPublish(address, String.Empty, true, properties, body);
         }
 
+        // The following method is different in comparison to the same method in the original class ConventionalRoutingTopology.
         public void DeclareAndInitialize(IModel channel, IEnumerable<string> receivingAddresses, IEnumerable<string> sendingAddresses)
         {
             foreach (var address in receivingAddresses.Concat(sendingAddresses))
             {
                 channel.QueueDeclare(address, this.useDurableExchanges, false, false, new Dictionary<string, object>
                 {
-                    // we cast priority to int as RabbitMQ client can't parse byte value
+                    // Below the max priority is passed as a header. It allows creating of queues with priority feature. 
+                    // We cast priority value to int as RabbitMQ client can't parse byte value.
                     { Headers.XMaxPriority, (int)this.maxPriority }
                 });
 
