@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
+    using System.Collections.Generic;
     using System.Security.Cryptography.X509Certificates;
     using Configuration.AdvanceExtensibility;
     using RabbitMQ.Client.Events;
@@ -50,9 +51,10 @@
         /// </summary>
         /// <param name="transportExtensions"></param>
         /// <param name="maxPriority">Max priority of queue message.</param>
-        public static TransportExtensions<RabbitMQTransport> UseConventionRoutingWithPrioritySupportTopology(this TransportExtensions<RabbitMQTransport> transportExtensions, byte maxPriority)
+        /// <param name="queuesWithoutPriority">The list of queues that should not be prioritized.</param>
+        public static TransportExtensions<RabbitMQTransport> UseConventionRoutingWithPrioritySupportTopology(this TransportExtensions<RabbitMQTransport> transportExtensions, byte maxPriority, IEnumerable<string> queuesWithoutPriority)
         {
-            transportExtensions.UseRoutingTopology(durable => new ConventionalRoutingWithPrioritySupportTopology(durable, maxPriority));
+            transportExtensions.UseRoutingTopology(durable => new ConventionalRoutingWithPrioritySupportTopology(durable, maxPriority, queuesWithoutPriority));
 
             return transportExtensions;
         }

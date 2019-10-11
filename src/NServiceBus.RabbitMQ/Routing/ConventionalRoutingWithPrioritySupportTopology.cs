@@ -26,11 +26,13 @@
     {
         readonly bool useDurableExchanges;
         readonly byte maxPriority;
+        readonly ISet<string> queuesWithoutPriority;
 
-        public ConventionalRoutingWithPrioritySupportTopology(bool useDurableExchanges, byte maxPriority)
+        public ConventionalRoutingWithPrioritySupportTopology(bool useDurableExchanges, byte maxPriority, IEnumerable<string> queuesWithoutPriority)
         {
             this.useDurableExchanges = useDurableExchanges;
             this.maxPriority = maxPriority;
+            this.queuesWithoutPriority = new HashSet<string>(queuesWithoutPriority);
         }
 
         public void SetupSubscription(IModel channel, Type type, string subscriberName)
@@ -80,12 +82,14 @@
         {
             foreach (var address in receivingAddresses.Concat(sendingAddresses))
             {
-                channel.QueueDeclare(address, this.useDurableExchanges, false, false, new Dictionary<string, object>
+                var properties = new Dictionary<string, object>();
+
+                if (!this.queuesWithoutPriority.Contains(address))
                 {
-                    // Below the max priority is passed as a header. It allows creating of queues with priority feature. 
-                    // We cast priority value to int as RabbitMQ client can't parse byte value.
-                    { Headers.XMaxPriority, (int)this.maxPriority }
-                });
+                    properties.Add(Headers.XMaxPriority, (int) this.maxPriority);
+                }
+
+                channel.QueueDeclare(address, this.useDurableExchanges, false, false, properties);
 
                 Initialize(channel, address);
             }
